@@ -30,6 +30,16 @@
 
 ## API 中转站
 
-- wawapii.com/v1
+### wawapii.com
+- 端点: https://wawapii.com/v1
+- 用途: 生图 MCP 后端
 - 模型: gpt-image-2
+- 状态: 已停用（余额不足，2026-07-29 确认）
+
+### wawazz.xyz
+- 端点: https://wawazz.xyz/v1
+- 用途: 通用 API 中转（文本 + 生图）
+- 已确认模型: gpt-5.5, gpt-5.4, gpt-5.4-mini, gpt-5.3-codex-spark, gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna
+- 生图: /v1/images/generations 可用（传入 gpt-image-2 正常返回）
 - 注意: 需 User-Agent + Accept 头
+- 状态: 当前使用中（2026-07-29）
