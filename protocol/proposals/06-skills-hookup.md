@@ -1,57 +1,58 @@
 # PROPOSAL — quick-save + godot-research 接中枢
 
-> 提案者: Claude | 阶段: 🔄 需修改 | 日期: 2026-07-29
+> 提案者: Claude | 验证: gpt-5.5 | 阶段: ✅ 通过 | 日期: 2026-07-29
 
-## gpt-5.5 验证结论
+## 验证历程
 
-**判断: ⚠️ 可行，但需修改**
+### 初审 (gpt-5.5)
+⚠️ 可行但需修改: 三个技能各自读改写会写乱中枢，需要统一更新器 + 幂等规则
 
-核心问题: 三个技能各自读改写 roadmap.json，SHA 乐观锁只能发现冲突不能解决。godot-research 更新面大（notes + learningLog + skillTree），容易写乱。
+### 修订
+- 抽共享 updateRoadmap(patchFn) 模式
+- SHA 冲突重试 3 次
+- quick-save 先接（风险小），godot-research 后接
 
-gpt-5.5 建议:
-1. 抽出一个共享的 `updateRoadmap(patchFn)` 逻辑，不要三个技能各自实现
-2. SHA 冲突后必须有重拉→重新合并→重试策略
-3. 定义精确的更新语义（去重键、幂等、append-only vs 覆盖）
-4. quick-save 先接（风险小），godot-research 在规则定义清楚后再接
+### 复审 (gpt-5.5)
+✅ 通过，附带 6 个实施条件:
+1. patchFn 必须是纯函数，冲突重试时不可产生重复副作用
+2. 3 次重试失败 → 明确错误提示，不静默
+3. skillTree 按稳定 id 合并，只增不减，已有字段只补空值
+4. notes path 写入前 normal 化
+5. learningLog date 固定 YYYY-MM-DD 本地时区
+6. 两个技能最终都只能通过 updateRoadmap 写，不留旧路径
 
-## 修订后的设计
-
-### 核心: 统一 roadmap 更新器
-
-每个技能不再直接操作 roadmap.json，而是调用同一个模式：
+## 最终设计
 
 ```
-技能完成文件 push
-→ 拉取最新 roadmap.json + SHA
-→ 应用 patch（技能定义的合并函数）
-→ 校验 schema
-→ push with SHA
-→ 冲突 → 重拉 → 重算 → 重试
-→ 超过 3 次失败 → 报错让用户处理
+技能 push 完成
+→ updateRoadmap(current => {
+    // 纯函数 patch
+    return { ...current, field: merged }
+  })
+→ 内部: 拉最新 + 应用 patch + schema 校验 + push
+→ SHA 冲突 → 重拉重算重试 (max 3)
+→ 失败 → 报 RoadmapUpdateConflictError
 ```
 
-### quick-save patch（先接）
-- 读取本地文件列表 → 与 codebase 对比 → 新增/更新 path + role + lastModified
-- 以 path 为唯一键去重
-- 状态标记: 新文件 active，旧文件如不存在则 stale
+### quick-save patch
+- codebase.scripts/scenes: path 去重，status active/stale
 
-### godot-research patch（后接）
-- notes[]: 以 path 为唯一键，不重复新增
-- learningLog[]: 以 date + topic 为唯一键，append-only
-- skillTree: 只追加 topics/nextTopics，不降级
+### godot-research patch
+- notes[]: normalized path 去重
+- learningLog[]: date(YYYY-MM-DD) + topic 去重，append-only
+- skillTree: id 去重，只增不删，已有节点只补空值
 
 ## 改动清单
 
 | 文件 | 操作 |
 |------|------|
-| skills/quick-save/SKILL.md | 更新 (save_skill overwrite) |
-| skills/godot-research/SKILL.md | 更新 (save_skill overwrite) |
+| skills/quick-save/SKILL.md | 更新 |
+| skills/godot-research/SKILL.md | 更新 |
 | protocol/03-skills/quick-save.md | 更新 |
 | protocol/03-skills/godot-research.md | 更新 |
-| protocol/01-architecture.md | 状态 🟡→🟢 |
+| protocol/01-architecture.md | 🟡→🟢 |
 | protocol/05-changelog.md | 记录 |
 
-## 风险
-
-- 重试上限 3 次 → 超过则告知用户手动处理
-- skillTree 合并规则要谨慎 → 只增不减
+## 实施顺序
+1. quick-save 先接 (codebase 更新, 风险小)
+2. godot-research 后接 (notes + log + skillTree, 规则复杂)
