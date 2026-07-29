@@ -1,30 +1,44 @@
 # PROPOSAL — quick-save + godot-research 接中枢
 
-> 提案者: Claude | 阶段: ⏳ 待验证 | 日期: 2026-07-29
+> 提案者: Claude | 阶段: 🔄 需修改 | 日期: 2026-07-29
 
-## 背景
+## gpt-5.5 验证结论
 
-两个技能目前半断：
-- `quick-save`: 能推代码，但不更新 roadmap.json codebase
-- `godot-research`: 能推笔记，但不更新 roadmap.json notes + learningLog
+**判断: ⚠️ 可行，但需修改**
 
-## 设计
+核心问题: 三个技能各自读改写 roadmap.json，SHA 乐观锁只能发现冲突不能解决。godot-research 更新面大（notes + learningLog + skillTree），容易写乱。
 
-### quick-save 补接
+gpt-5.5 建议:
+1. 抽出一个共享的 `updateRoadmap(patchFn)` 逻辑，不要三个技能各自实现
+2. SHA 冲突后必须有重拉→重新合并→重试策略
+3. 定义精确的更新语义（去重键、幂等、append-only vs 覆盖）
+4. quick-save 先接（风险小），godot-research 在规则定义清楚后再接
 
-在现有「推送文件→确认完成」流程中间插入一步：
+## 修订后的设计
 
-```
-push_files 完成 → 读 roadmap.json → 更新 codebase.scripts/scenes → push roadmap.json → 确认
-```
+### 核心: 统一 roadmap 更新器
 
-### godot-research 补接
-
-在现有「push 笔记→总结回复」流程中间插入一步：
+每个技能不再直接操作 roadmap.json，而是调用同一个模式：
 
 ```
-push 笔记完成 → 读 roadmap.json → 更新 notes[] + learningLog[] + skillTree → push roadmap.json → 总结回复
+技能完成文件 push
+→ 拉取最新 roadmap.json + SHA
+→ 应用 patch（技能定义的合并函数）
+→ 校验 schema
+→ push with SHA
+→ 冲突 → 重拉 → 重算 → 重试
+→ 超过 3 次失败 → 报错让用户处理
 ```
+
+### quick-save patch（先接）
+- 读取本地文件列表 → 与 codebase 对比 → 新增/更新 path + role + lastModified
+- 以 path 为唯一键去重
+- 状态标记: 新文件 active，旧文件如不存在则 stale
+
+### godot-research patch（后接）
+- notes[]: 以 path 为唯一键，不重复新增
+- learningLog[]: 以 date + topic 为唯一键，append-only
+- skillTree: 只追加 topics/nextTopics，不降级
 
 ## 改动清单
 
@@ -39,17 +53,5 @@ push 笔记完成 → 读 roadmap.json → 更新 notes[] + learningLog[] + skil
 
 ## 风险
 
-- roadmap.json SHA 冲突（与 learn-review 同时写）→ SHA 乐观锁
-- 两个技能改动小，风险低
-
-## 验证
-
-```
-□ quick-save 推送新脚本后 roadmap.json.codebase 有对应条目
-□ godot-research 推送笔记后 roadmap.json.notes 有对应条目
-□ 交叉验证 10 项通过
-```
-
-## 回滚
-
-save_skill 恢复旧版 + GitHub revert protocol 改动。
+- 重试上限 3 次 → 超过则告知用户手动处理
+- skillTree 合并规则要谨慎 → 只增不减
