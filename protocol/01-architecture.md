@@ -14,6 +14,10 @@ learn-review      quick-save      godot-research   profile-distill
 wawazz.xyz ← 文本模型能力（辅助层）
   ↑ 调用
 godot-research / 翻译 / 代码审查 / 命名
+
+gpt-5.5 ← 方案验证（跨 AI 协作）
+  ↑ 验证
+proposals/ 目录下的方案
 ```
 
 ## 技能注册表
@@ -21,8 +25,8 @@ godot-research / 翻译 / 代码审查 / 命名
 | 技能 | 协议文件 | 状态 | 作用 | 修改文件 |
 |------|----------|------|------|----------|
 | learn-review | `protocol/03-skills/learn-review.md` | 🟢 正常 | 学习复盘 | roadmap.json, README.md |
-| quick-save | `protocol/03-skills/quick-save.md` | 🟡 半接 | 推送代码 | learn/*, roadmap.json |
-| godot-research | `protocol/03-skills/godot-research.md` | 🟡 半接 | 搜索教程 | notes/*, roadmap.json |
+| quick-save | `protocol/03-skills/quick-save.md` | 🟢 正常 | 推送代码 | learn/*, roadmap.json |
+| godot-research | `protocol/03-skills/godot-research.md` | 🟢 正常 | 搜索教程 | notes/*, roadmap.json |
 | wawazz | `protocol/03-skills/wawazz.md` | 🟢 正常 | 文本模型调用 | — |
 | canvas-design | — | 🟢 | 视觉素材 | — |
 | find-skills | — | 🟢 | 发现技能 | — |
@@ -55,11 +59,12 @@ my-first-godot-game/
 └── assets/                  ← 预留：游戏素材
 ```
 
+## 外部协作
+
+- **验证 AI (gpt-5.5)**: 读 proposals/ 目录方案 → 判断可行性 → 返回修改意见
+- **其他 AI**: 读 PROTOCOL.md 入口 → 按需读 protocol/ → 独立执行 → 跑交叉验证
+
 ## 自动化
 
 - `daily-game-dev-news`: 每日 9:00，抓取游戏/GitHub 新闻
 - `auto-sync-godot`: 每晚 23:00，检测 Godot 改动推送
-
-## 交叉验证
-
-任何 AI 执行操作后运行 `protocol/06-operations.md` 的 10 项检查清单。
