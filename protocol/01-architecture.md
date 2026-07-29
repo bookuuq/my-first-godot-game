@@ -10,6 +10,10 @@ roadmap.json (GitHub) ← 唯一真实来源
 learn-review      quick-save      godot-research   profile-distill
   ↓                  ↓               ↓                ↓
 更新里程碑/技能树   更新 codebase    更新 notes/log    更新用户画像
+
+wawazz.xyz ← 文本模型能力（辅助层）
+  ↑ 调用
+godot-research / 翻译 / 代码审查 / 命名
 ```
 
 ## 技能注册表
@@ -19,6 +23,7 @@ learn-review      quick-save      godot-research   profile-distill
 | learn-review | `protocol/03-skills/learn-review.md` | 🔴 待重写 | 学习复盘 | roadmap.json, README.md |
 | quick-save | `protocol/03-skills/quick-save.md` | 🟡 半接 | 推送代码 | learn/*, roadmap.json |
 | godot-research | `protocol/03-skills/godot-research.md` | 🟡 半接 | 搜索教程 | notes/*, roadmap.json |
+| wawazz | `protocol/03-skills/wawazz.md` | 🟢 正常 | 文本模型调用 | — |
 | canvas-design | — | 🟢 | 视觉素材 | — |
 | find-skills | — | 🟢 | 发现技能 | — |
 | skill-creator | — | 🟢 | 创建技能 | — |
@@ -39,7 +44,8 @@ my-first-godot-game/
 │   ├── 03-skills/
 │   │   ├── learn-review.md
 │   │   ├── quick-save.md
-│   │   └── godot-research.md
+│   │   ├── godot-research.md
+│   │   └── wawazz.md
 │   ├── 04-tools.md
 │   ├── 05-changelog.md
 │   └── 06-operations.md

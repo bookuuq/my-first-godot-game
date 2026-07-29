@@ -1,5 +1,27 @@
 # protocol/05 — 变更日志
 
+## 2026-07-29 — 新增 wawazz skill
+
+**类型**: 功能新增
+**触发**: 用户提供 wawazz.xyz API 中转站，要求做成可调用 skill
+
+**新增**:
+- wawazz skill (save_skill + protocol/03-skills/wawazz.md)
+- protocol/proposals/03-wawazz-skill.md — 方案 + 验证记录
+- protocol/04-tools.md 更新 — wawazz.xyz 端点 + wawapii 标记停用
+
+**验证流程**:
+1. 方案入 proposals/ → 验证 AI 审查（3 处修改，1 处阻塞已修）→ 通过
+2. SKILL.md 保存至 Claude 本地 skills 目录
+3. protocol 文档同步更新
+
+**影响**:
+- 技能总数 7 → 8
+- wawazz 为辅助层，不直接读写 roadmap.json
+- godot-research 未来可通过 wawazz 做概念解释/翻译
+
+---
+
 ## 2026-07-29 — 协议体系初始化
 
 **类型**: 架构变更
@@ -19,17 +41,6 @@
 
 **保留**:
 - ARCHITECTURE.md — 旧版，仍可读但不作为 AI 入口
-
-**影响**:
-- 所有 AI 首次进入只需读 PROTOCOL.md + 00-identity + 01-architecture
-- 具体任务时按路由读取对应的 protocol/ 文件
-- 交叉验证逻辑写入了 06-operations.md
-
-**待接回路**:
-- learn-review: 🔴 P0 重写
-- quick-save: 🟡 P1 补接
-- godot-research: 🟡 P1 补接
-- profile-distill: 🟢 P2 补接
 
 ---
 
