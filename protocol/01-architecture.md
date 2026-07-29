@@ -20,7 +20,7 @@ godot-research / 翻译 / 代码审查 / 命名
 
 | 技能 | 协议文件 | 状态 | 作用 | 修改文件 |
 |------|----------|------|------|----------|
-| learn-review | `protocol/03-skills/learn-review.md` | 🔴 待重写 | 学习复盘 | roadmap.json, README.md |
+| learn-review | `protocol/03-skills/learn-review.md` | 🟢 正常 | 学习复盘 | roadmap.json, README.md |
 | quick-save | `protocol/03-skills/quick-save.md` | 🟡 半接 | 推送代码 | learn/*, roadmap.json |
 | godot-research | `protocol/03-skills/godot-research.md` | 🟡 半接 | 搜索教程 | notes/*, roadmap.json |
 | wawazz | `protocol/03-skills/wawazz.md` | 🟢 正常 | 文本模型调用 | — |
@@ -34,6 +34,7 @@ godot-research / 翻译 / 代码审查 / 命名
 ```
 my-first-godot-game/
 ├── PROTOCOL.md              ← AI 入口
+├── SYSTEM-OVERVIEW.md       ← 大项目全景
 ├── roadmap.json             ← 数据中枢
 ├── README.md                ← 人类入口
 ├── ARCHITECTURE.md          ← 旧版（保留参考）
@@ -59,13 +60,6 @@ my-first-godot-game/
 - `daily-game-dev-news`: 每日 9:00，抓取游戏/GitHub 新闻
 - `auto-sync-godot`: 每晚 23:00，检测 Godot 改动推送
 
-## 交叉验证机制
+## 交叉验证
 
-任何 AI 都可以执行以下校验：
-
-1. 检查 roadmap.json 的 `meta.lastUpdated` 是否与 `protocol/05-changelog.md` 最新条目一致
-2. roadmap.json.codebase 列出的文件是否在 GitHub 上实际存在
-3. roadmap.json.notes 列出的笔记是否与 notes/ 目录一致
-4. 技能声称修改了 roadmap.json 的字段后，commit diff 是否匹配
-
-→ 详见 `protocol/06-operations.md` 的"交叉验证"部分
+任何 AI 执行操作后运行 `protocol/06-operations.md` 的 10 项检查清单。

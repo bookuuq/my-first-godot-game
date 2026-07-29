@@ -1,7 +1,7 @@
 # protocol/03-skills/learn-review
 
 ## 元信息
-- 状态: 🔴 待重写
+- 状态: 🟢 正常（已重写）
 - 中枢: 读写 roadmap.json (progress, skillTree, learningLog)
 - 副作用: 更新 README.md, 更新 user-profile.md
 
@@ -9,29 +9,28 @@
 用户说「复盘」「学完了」「记录一下」或一轮学习结束
 
 ## 输入
-- 对话内容（用户说了学了什么、做了什么）
-- 当前 roadmap.json (GitHub)
+- 对话内容（用户学了什么、做了什么、多久）
+- 当前 roadmap.json (GitHub, 含 SHA)
 
 ## 输出
-1. roadmap.json 更新:
-   - `progress.completedMilestones`: 如完成当前里程碑，新增条目
-   - `progress.currentMilestone`: 如推进到下一阶段，更新
-   - `progress.nextSteps`: 如有新的下一步，追加或完成移除
-   - `progress.totalHoursSpent`: 累加本次时长
-   - `skillTree`: 如技能进阶，更新对应维度的 topics/nextTopics/level
-   - `learningLog`: 追加新条目
-   - `meta.lastUpdated`: 更新为当前时间
-2. README.md 更新: 从 roadmap.json 渲染完成列表、进行中、下一步
-3. user-profile.md 更新: 如知识水平有变化
+
+### roadmap.json 更新字段
+- `progress.completedMilestones`: 完成 → 追加 {date, id, title, desc}
+- `progress.currentMilestone`: 推进 → 替换
+- `progress.nextSteps`: 新增/移除
+- `progress.totalHoursSpent`: 累加
+- `skillTree.*.topics/nextTopics/level`: 按规则更新
+- `learningLog`: 追加 {date, topic, duration, summary}
+- `meta.lastUpdated`: 更新
+
+### 其他文件
+- README.md: 从 roadmap.json 重新渲染
+- user-profile.md: 知识水平变化时更新
 
 ## 操作流程
-1. 用 GitHub API 获取 roadmap.json 最新内容和 SHA
-2. 友好对话提取本轮学习内容
-3. 生成更新后的 JSON（只改必要字段，保留其他不变）
-4. 用 SHA 推送到 GitHub（防冲突）
-5. 同样流程更新 README.md
-6. 检查 user-profile.md 是否需要更新
+1. 对话提取 → 2. GitHub 读 roadmap.json + SHA → 3. 更新目标字段 → 4. push（带 SHA）→ 5. 渲染 README → push → 6. 检查画像 → 7. 交叉验证 → 8. 总结回复
 
 ## 约束
-- 合规性: 任何修改必须通过 `protocol/06-operations.md` 的交叉验证检查
-- 错误处理: GitHub 写入失败时告知用户，不静默丢弃
+- 只改目标字段，不整文件重写 roadmap.json
+- commit: `[learn-review] 摘要`
+- 必须跑交叉验证
